@@ -1,10 +1,10 @@
 package endpoints
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
 func HealthCheck(w http.ResponseWriter, r *http.Request){
-	fmt.Fprintf(w, "Sample text for testing")
+	log.Printf("server is up")
 }
