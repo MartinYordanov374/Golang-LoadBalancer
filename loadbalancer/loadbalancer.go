@@ -6,10 +6,18 @@ import (
 	"log"
 )
 
+type Server struct {
+	ID string
+	Host string
+	Port int
+	IsUp bool
+}
+
 func main(){
 	go func(){
 		http.ListenAndServe(":8000", nil)
 	}()
+
 
 	PerformHealthCheck()
 
