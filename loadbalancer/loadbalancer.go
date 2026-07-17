@@ -19,15 +19,34 @@ func main(){
 		http.ListenAndServe(":8000", nil)
 	}()
 
-	Servers := make(map[string]Server)
-
-	Servers["ServerOne"] = Server{ID: uuid.New().String(), Host: "localhost", Port: 8080, IsUp: false}
-	Servers["ServerTwo"] = Server{ID: uuid.New().String(), Host: "localhost", Port: 8081, IsUp: false}
-	Servers["ServerThree"] = Server{ID: uuid.New().String(), Host: "localhost", Port: 8082, IsUp: false}
-
+	InitializeServersList()
 
 	PerformHealthCheck()
 
+
+}
+
+func InitializeServersList(){
+
+	Servers := make(map[string]Server)
+
+	Servers["ServerOne"] = Server{
+		ID: uuid.New().String(),
+		Host: "localhost",
+		Port: 8080,
+		IsUp: false}
+
+	Servers["ServerTwo"] = Server{
+		ID: uuid.New().String(),
+		Host: "localhost",
+		Port: 8080,
+		IsUp: false}
+
+	Servers["ServerThree"] = Server{
+		ID: uuid.New().String(),
+		Host: "localhost",
+		Port: 8080,
+		IsUp: false}
 
 }
 
