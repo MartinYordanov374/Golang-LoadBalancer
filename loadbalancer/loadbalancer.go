@@ -19,38 +19,40 @@ func main(){
 		http.ListenAndServe(":8000", nil)
 	}()
 
-	InitializeServersList()
+	ServersList := InitializeServersList()
 
-	PerformHealthCheck()
+	PerformHealthCheck(ServersList["ServerOne"])
 
-
-}
-
-func InitializeServersList(){
-
-	Servers := make(map[string]Server)
-
-	Servers["ServerOne"] = Server{
-		ID: uuid.New().String(),
-		Host: "localhost",
-		Port: 8080,
-		IsUp: false}
-
-	Servers["ServerTwo"] = Server{
-		ID: uuid.New().String(),
-		Host: "localhost",
-		Port: 8080,
-		IsUp: false}
-
-	Servers["ServerThree"] = Server{
-		ID: uuid.New().String(),
-		Host: "localhost",
-		Port: 8080,
-		IsUp: false}
 
 }
 
-func PerformHealthCheck(){
+func InitializeServersList() map[string]*Server {
+
+	Servers := make(map[string]*Server)
+
+	Servers["ServerOne"] = &Server{
+		ID: uuid.New().String(),
+		Host: "localhost",
+		Port: 8080,
+		IsUp: false}
+
+	Servers["ServerTwo"] = &Server{
+		ID: uuid.New().String(),
+		Host: "localhost",
+		Port: 8080,
+		IsUp: false}
+
+	Servers["ServerThree"] = &Server{
+		ID: uuid.New().String(),
+		Host: "localhost",
+		Port: 8080,
+		IsUp: false}
+
+	return Servers
+
+}
+
+func PerformHealthCheck(TargetServer *Server){
 	resp, err := http.Get("http://localhost:8080/health")
 
 	if err != nil {
