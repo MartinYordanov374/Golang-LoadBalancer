@@ -28,8 +28,8 @@ func main() {
 	for range ticker.C {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(ServersList))
-		for _, Server := range ServersList {
-			go PerformHealthCheck(Server, wg)
+		for ServerListKey, Server := range ServersList {
+			go PerformHealthCheck(Server, wg, ServerListKey)
 		}
 		wg.Wait()
 	}
@@ -61,14 +61,14 @@ func InitializeServersList() map[string]*Server {
 
 }
 
-func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup) {
+func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup, ServerListKey string) {
 
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
 	resp, err := http.Get(uri)
 
 	if err != nil {
-		log.Println("Health check failed for ", TargetServer.ID)
+		log.Println("Health check failed for ", ServerListKey)
 		log.Println(err)
 		return
 	}
