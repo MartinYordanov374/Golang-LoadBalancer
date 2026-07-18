@@ -16,6 +16,7 @@ type Server struct {
 	Host string
 	Port int
 	IsUp bool
+	Mutex sync.RWMutex
 }
 
 type HealthCheckEndpointResponse struct {
@@ -98,10 +99,12 @@ func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
 }
 
 func UpdateServerHealthState(TargetServer *Server, StatusCode int){
-	// TODO: Consider race conditions here, use locks, mutex?.
+
+	TargetServer.Mutex.RLock()
 	if StatusCode == 200{
 		TargetServer.IsUp = true
 	}else{
 		TargetServer.IsUp = false
 	}
+	TargetServer.Mutex.RUnlock()
 }
