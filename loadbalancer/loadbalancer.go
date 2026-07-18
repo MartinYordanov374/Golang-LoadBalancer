@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
+	"encoding/json"
 )
 
 type Server struct {
@@ -15,6 +16,11 @@ type Server struct {
 	Host string
 	Port int
 	IsUp bool
+}
+
+type HealthCheckEndpointResponse struct {
+	StatusCode int `json:"StatusCode"`
+	Message string	`json:"Message"`
 }
 
 func main() {
@@ -61,7 +67,7 @@ func InitializeServersList() map[string]*Server {
 
 }
 
-func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup, ServerListKey string) {
+func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup, ServerListKey string){
 
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
@@ -79,5 +85,9 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup, ServerL
 		log.Println(err)
 		return
 	}
-	log.Println(string(jsonbody))
+
+	var parsedJSON HealthCheckEndpointResponse
+
+	json.Unmarshal([]byte(jsonbody), &parsedJSON)
+	log.Println(parsedJSON.StatusCode)
 }
