@@ -25,6 +25,7 @@ type HealthCheckEndpointResponse struct {
 
 func main() {
 	go func() {
+		// TODO: Consider adding a handler here instead of nil
 		http.ListenAndServe(":8000", nil)
 	}()
 
@@ -97,7 +98,7 @@ func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
 }
 
 func UpdateServerHealthState(TargetServer *Server, StatusCode int){
-
+	// TODO: Consider race conditions here, use locks, mutex?.
 	if StatusCode == 200{
 		TargetServer.IsUp = true
 	}else{
