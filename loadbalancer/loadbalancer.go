@@ -34,8 +34,8 @@ func main() {
 	for range ticker.C {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(ServersList))
-		for ServerListKey, Server := range ServersList {
-			go PerformHealthCheck(Server, wg, ServerListKey)
+		for _, Server := range ServersList {
+			go PerformHealthCheck(Server, wg)
 		}
 		wg.Wait()
 	}
@@ -67,15 +67,14 @@ func InitializeServersList() map[string]*Server {
 
 }
 
-func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup, ServerListKey string){
+func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup){
 
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
 	resp, err := http.Get(uri)
 
 	if err != nil {
-		log.Println("Health check failed for ", ServerListKey)
-		log.Println(err)
+		UpdateServerHealthState(TargetServer, 503)
 		return
 	}
 	defer resp.Body.Close()
@@ -84,21 +83,24 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup, ServerL
 	if err != nil {
 		log.Println(err)
 		return
+	}else{
+		ParsedJSON := ParseJSONResponse(jsonbody)
+		UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
 	}
-
-	UpdateServerHealthState(TargetServer, jsonbody)
 }
 
-func UpdateServerHealthState(TargetServer *Server, HealthCheckResponseJSON []byte){
+func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
 
 	var ParsedJSON HealthCheckEndpointResponse
-	json.Unmarshal([]byte(HealthCheckResponseJSON), &ParsedJSON)
-	log.Println(TargetServer)
-	if ParsedJSON.StatusCode == 200{
+	json.Unmarshal([]byte(JSONResponse), &ParsedJSON)
+	return ParsedJSON
+}
+
+func UpdateServerHealthState(TargetServer *Server, StatusCode int){
+
+	if StatusCode == 200{
 		TargetServer.IsUp = true
 	}else{
 		TargetServer.IsUp = false
 	}
-
-	log.Println(TargetServer)
 }
