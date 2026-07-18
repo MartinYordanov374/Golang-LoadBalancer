@@ -86,8 +86,19 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup, ServerL
 		return
 	}
 
-	var parsedJSON HealthCheckEndpointResponse
+	UpdateServerHealthState(TargetServer, jsonbody)
+}
 
-	json.Unmarshal([]byte(jsonbody), &parsedJSON)
-	log.Println(parsedJSON.StatusCode)
+func UpdateServerHealthState(TargetServer *Server, HealthCheckResponseJSON []byte){
+
+	var ParsedJSON HealthCheckEndpointResponse
+	json.Unmarshal([]byte(HealthCheckResponseJSON), &ParsedJSON)
+	log.Println(TargetServer)
+	if ParsedJSON.StatusCode == 200{
+		TargetServer.IsUp = true
+	}else{
+		TargetServer.IsUp = false
+	}
+
+	log.Println(TargetServer)
 }
