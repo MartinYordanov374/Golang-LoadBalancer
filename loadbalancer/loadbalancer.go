@@ -43,27 +43,27 @@ func main() {
 	}
 }
 
-func InitializeServersList() map[string]*Server {
+func InitializeServersList() []*Server {
+	//TODO: Automate the initialization process
+	Servers := []*Server{}
 
-	Servers := make(map[string]*Server)
-
-	Servers["ServerOne"] = &Server{
+	Servers = append(Servers, &Server{
 		ID:   uuid.New().String(),
 		Host: "localhost",
 		Port: 8080,
-		IsUp: false}
+		IsUp: false})
 
-	Servers["ServerTwo"] = &Server{
+	Servers = append(Servers, &Server{
 		ID:   uuid.New().String(),
 		Host: "localhost",
 		Port: 8081,
-		IsUp: false}
+		IsUp: false})
 
-	Servers["ServerThree"] = &Server{
+	Servers = append(Servers, &Server{
 		ID:   uuid.New().String(),
 		Host: "localhost",
 		Port: 8082,
-		IsUp: false}
+		IsUp: false})
 
 	return Servers
 
@@ -74,7 +74,6 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup){
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
 	resp, err := http.Get(uri)
-
 	if err != nil {
 		UpdateServerHealthState(TargetServer, 503)
 		return
