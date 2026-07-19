@@ -100,11 +100,12 @@ func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
 
 func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 
-	TargetServer.Mutex.RLock()
+	TargetServer.Mutex.Lock()
 	if StatusCode == 200{
 		TargetServer.IsUp = true
 	}else{
 		TargetServer.IsUp = false
 	}
-	TargetServer.Mutex.RUnlock()
+	TargetServer.Mutex.Unlock()
 }
+//TODO: Implement round robin function here. It will redirect all incoming requests(to the load balancer) to the backend servers in a sequential manner.
