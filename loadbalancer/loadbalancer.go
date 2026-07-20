@@ -54,6 +54,7 @@ func main() {
 			CurrentServer.Mutex.Unlock()
 		}
 		HealthyServersList.Store(UpServersList)
+		FindNextServerIdx()
 	}
 
 }
@@ -135,15 +136,15 @@ func RoundRobin(){
 
 func FindNextServerIdx() {
 	LoadedHealthyServersList := HealthyServersList.Load().([]*Server)
-
-	var AtomicCurrentServerIdx = atomic.LoadUint32(&CurrentServerIdx)
-	var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
-
-	if AtomicCurrentServerIdx+1 > AtomicHealthyServersListEndIdx{
-		log.Println("Restarting server index to 0")
-		atomic.StoreUint32(&CurrentServerIdx, 0)
-	}else{
-		log.Println(CurrentServerIdx)
-		atomic.AddUint32(&CurrentServerIdx, 1)
+	if len(LoadedHealthyServersList) > 0{
+		var AtomicCurrentServerIdx = atomic.LoadUint32(&CurrentServerIdx)
+		var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
+		if AtomicCurrentServerIdx+1 > AtomicHealthyServersListEndIdx{
+			log.Println("Restarting server index to 0")
+			atomic.StoreUint32(&CurrentServerIdx, 0)
+		}else{
+			log.Println(CurrentServerIdx)
+			atomic.AddUint32(&CurrentServerIdx, 1)
+		}
 	}
 }
