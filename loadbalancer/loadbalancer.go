@@ -41,6 +41,8 @@ func main() {
 		}
 		wg.Wait()
 	}
+
+
 }
 
 func InitializeServersList() []*Server {
@@ -108,3 +110,22 @@ func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 	TargetServer.Mutex.Unlock()
 }
 //TODO: Implement round robin function here. It will redirect all incoming requests(to the load balancer) to the backend servers in a sequential manner.
+func RoundRobin(ServersList []*Server, CurrentServerIdx int){
+	// 1. Keep track of current server
+	// 2. Route to current server and identify the next server
+	// 2.1 If the current server was the last in line, return the server counter to the 0-th index
+	// 2.2 Identify only up servers and skip the down servers when routing, i.e. if servers 1 and 3 are up, skip 2.
+}
+
+func FindNextServer(ServersList []*Server, CurrentServerIdx int) int {
+
+	var NextServerIdx = CurrentServerIdx + 1
+	var EndServerIdx = len(ServersList)-1
+
+	if NextServerIdx > EndServerIdx{
+		CurrentServerIdx = 0
+		return 0
+	}else{
+		return NextServerIdx
+	}
+}
