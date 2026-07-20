@@ -26,12 +26,12 @@ type HealthCheckEndpointResponse struct {
 }
 
 var HealthyServersList atomic.Value
+var CurrentServerIdx uint32 = 0
 
 func main() {
 	go func() {
 		// TODO: Consider adding a handler here instead of nil
 		http.ListenAndServe(":8000", nil)
-
 	}()
 
 	ServersList := InitializeServersList()
@@ -54,8 +54,6 @@ func main() {
 			CurrentServer.Mutex.Unlock()
 		}
 		HealthyServersList.Store(UpServersList)
-		log.Println(HealthyServersList)
-
 	}
 
 }
@@ -125,25 +123,27 @@ func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 	TargetServer.Mutex.Unlock()
 }
 //TODO: Implement round robin function here. It will redirect all incoming requests(to the load balancer) to the backend servers in a sequential manner.
-func RoundRobin(ServersList []*Server, CurrentServerIdx int){
+func RoundRobin(){
 	// 1. Keep track of current server
 	// 2. Route to current server and identify the next server
 	// 2.1 If the current server was the last in line, return the server counter to the 0-th index
 	// 2.2 Identify only up servers and skip the down servers when routing, i.e. if servers 1 and 3 are up, skip 2.
 
-	var NextServerIdx int = FindNextServerIdx(ServersList, CurrentServerIdx)
-	log.Println(NextServerIdx)
+
+
 }
 
-func FindNextServerIdx(ServersList []*Server, CurrentServerIdx int) int {
-	//TODO: Add locks in case multiple requests come in at the same time.
-	var NextServerIdx = CurrentServerIdx + 1
-	var EndServerIdx = len(ServersList) - 1
+func FindNextServerIdx() {
+	LoadedHealthyServersList := HealthyServersList.Load().([]*Server)
 
-	if NextServerIdx > EndServerIdx{
-		CurrentServerIdx = 0
-		return 0
+	var AtomicCurrentServerIdx = atomic.LoadUint32(&CurrentServerIdx)
+	var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
+
+	if AtomicCurrentServerIdx+1 > AtomicHealthyServersListEndIdx{
+		log.Println("Restarting server index to 0")
+		atomic.StoreUint32(&CurrentServerIdx, 0)
 	}else{
-		return NextServerIdx
+		log.Println(CurrentServerIdx)
+		atomic.AddUint32(&CurrentServerIdx, 1)
 	}
 }
