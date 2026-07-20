@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 	"encoding/json"
+	"sync/atomic"
 )
 
 type Server struct {
@@ -24,10 +25,13 @@ type HealthCheckEndpointResponse struct {
 	Message string	`json:"Message"`
 }
 
+var HealthyServersList atomic.Value
+
 func main() {
 	go func() {
 		// TODO: Consider adding a handler here instead of nil
 		http.ListenAndServe(":8000", nil)
+
 	}()
 
 	ServersList := InitializeServersList()
@@ -40,8 +44,19 @@ func main() {
 			go PerformHealthCheck(Server, wg)
 		}
 		wg.Wait()
-	}
 
+		UpServersList := make([]*Server, 0)
+		for _, CurrentServer := range ServersList{
+			CurrentServer.Mutex.Lock()
+			if CurrentServer.IsUp{
+				UpServersList = append(UpServersList, CurrentServer)
+			}
+			CurrentServer.Mutex.Unlock()
+		}
+		HealthyServersList.Store(UpServersList)
+		log.Println(HealthyServersList)
+
+	}
 
 }
 
@@ -115,12 +130,15 @@ func RoundRobin(ServersList []*Server, CurrentServerIdx int){
 	// 2. Route to current server and identify the next server
 	// 2.1 If the current server was the last in line, return the server counter to the 0-th index
 	// 2.2 Identify only up servers and skip the down servers when routing, i.e. if servers 1 and 3 are up, skip 2.
+
+	var NextServerIdx int = FindNextServerIdx(ServersList, CurrentServerIdx)
+	log.Println(NextServerIdx)
 }
 
-func FindNextServer(ServersList []*Server, CurrentServerIdx int) int {
-
+func FindNextServerIdx(ServersList []*Server, CurrentServerIdx int) int {
+	//TODO: Add locks in case multiple requests come in at the same time.
 	var NextServerIdx = CurrentServerIdx + 1
-	var EndServerIdx = len(ServersList)-1
+	var EndServerIdx = len(ServersList) - 1
 
 	if NextServerIdx > EndServerIdx{
 		CurrentServerIdx = 0
