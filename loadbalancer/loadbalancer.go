@@ -54,7 +54,6 @@ func main() {
 			CurrentServer.Mutex.Unlock()
 		}
 		HealthyServersList.Store(UpServersList)
-		FindNextServerIdx()
 	}
 
 }
@@ -114,7 +113,7 @@ func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
 }
 
 func UpdateServerHealthState(TargetServer *Server, StatusCode int){
-
+	//TODO: Rewrite this to use atomic values instead of mutex as apparently atomics introduce less overhead than mutexes
 	TargetServer.Mutex.Lock()
 	if StatusCode == 200{
 		TargetServer.IsUp = true
@@ -129,7 +128,7 @@ func RoundRobin(){
 	// 2. Route to current server and identify the next server
 	// 2.1 If the current server was the last in line, return the server counter to the 0-th index
 	// 2.2 Identify only up servers and skip the down servers when routing, i.e. if servers 1 and 3 are up, skip 2.
-
+	FindNextServerIdx()
 
 
 }
