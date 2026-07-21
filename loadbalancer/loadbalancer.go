@@ -128,10 +128,10 @@ func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 func RoundRobin(){
 	log.Println("The current server index is ", atomic.LoadUint32(&CurrentServerIdx))
 	LoadedHealthyServersList := LoadHealthyServersList()
-	if LoadedHealthyServersList != nil{
+	if LoadedHealthyServersList != nil && len(LoadedHealthyServersList) > 0{
 		FindNextServerIdx()
-		NextServer := LoadedHealthyServersList[CurrentServerIdx]
-		log.Println(NextServer)
+		//NextServer := LoadedHealthyServersList[CurrentServerIdx]
+		log.Println(LoadedHealthyServersList[CurrentServerIdx])
 		// TODO: Build the URL for the selected server and route to it
 	}
 
