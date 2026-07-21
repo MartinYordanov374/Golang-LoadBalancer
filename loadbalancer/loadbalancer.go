@@ -30,7 +30,9 @@ var CurrentServerIdx uint32 = 0
 
 func main() {
 	go func() {
-		// TODO: Consider adding a handler here instead of nil
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+			RoundRobin()
+		})
 		http.ListenAndServe(":8000", nil)
 	}()
 
@@ -59,7 +61,7 @@ func main() {
 }
 
 func InitializeServersList() []*Server {
-	//TODO: Automate the initialization process
+	// TODO: Automate the initialization process
 	Servers := []*Server{}
 
 	Servers = append(Servers, &Server{
@@ -113,7 +115,7 @@ func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
 }
 
 func UpdateServerHealthState(TargetServer *Server, StatusCode int){
-	//TODO: Rewrite this to use atomic values instead of mutex as apparently atomics introduce less overhead than mutexes
+	// TODO: Rewrite this to use atomic values instead of mutex as apparently atomics introduce less overhead than mutexes
 	TargetServer.Mutex.Lock()
 	if StatusCode == 200{
 		TargetServer.IsUp = true
@@ -122,13 +124,15 @@ func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 	}
 	TargetServer.Mutex.Unlock()
 }
-//TODO: Implement round robin function here. It will redirect all incoming requests(to the load balancer) to the backend servers in a sequential manner.
+// TODO: Implement round robin function here. It will redirect all incoming requests(to the load balancer) to the backend servers in a sequential manner.
 func RoundRobin(){
 	// 1. Keep track of current server
 	// 2. Route to current server and identify the next server
 	// 2.1 If the current server was the last in line, return the server counter to the 0-th index
 	// 2.2 Identify only up servers and skip the down servers when routing, i.e. if servers 1 and 3 are up, skip 2.
+	log.Println("The current server index is ", atomic.LoadUint32(&CurrentServerIdx))
 	FindNextServerIdx()
+	log.Println("The next server index is ", atomic.LoadUint32(&CurrentServerIdx))
 
 
 }
