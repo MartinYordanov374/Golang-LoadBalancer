@@ -138,14 +138,20 @@ func RoundRobin(){
 }
 
 func FindNextServerIdx() {
-	LoadedHealthyServersList := HealthyServersList.Load().([]*Server)
-	if len(LoadedHealthyServersList) > 0{
-		var AtomicCurrentServerIdx = atomic.LoadUint32(&CurrentServerIdx)
-		var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
-		if AtomicCurrentServerIdx+1 > AtomicHealthyServersListEndIdx{
-			atomic.StoreUint32(&CurrentServerIdx, 0)
-		}else{
-			atomic.AddUint32(&CurrentServerIdx, 1)
+	TempHealthyServersList := HealthyServersList.Load()
+	if TempHealthyServersList != nil{
+		LoadedHealthyServersList, _ := TempHealthyServersList.([]*Server)
+
+		if len(LoadedHealthyServersList) > 0{
+			var AtomicCurrentServerIdx = atomic.LoadUint32(&CurrentServerIdx)
+			var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
+			if AtomicCurrentServerIdx+1 > AtomicHealthyServersListEndIdx{
+				atomic.StoreUint32(&CurrentServerIdx, 0)
+			}else{
+				atomic.AddUint32(&CurrentServerIdx, 1)
+			}
 		}
+	}else{
+		return
 	}
 }
