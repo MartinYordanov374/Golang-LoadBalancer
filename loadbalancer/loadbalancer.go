@@ -130,9 +130,10 @@ func RoundRobin(){
 	LoadedHealthyServersList := LoadHealthyServersList()
 	if LoadedHealthyServersList != nil && len(LoadedHealthyServersList) > 0{
 		FindNextServerIdx()
-		//NextServer := LoadedHealthyServersList[CurrentServerIdx]
-		log.Println(LoadedHealthyServersList[CurrentServerIdx])
+		NextServer := LoadedHealthyServersList[CurrentServerIdx]
 		// TODO: Build the URL for the selected server and route to it
+		NextServerURL := fmt.Sprintf("http://%s:%d/", NextServer.Host, NextServer.Port)
+		log.Println(uri)
 	}
 
 }
