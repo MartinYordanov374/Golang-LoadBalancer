@@ -124,24 +124,22 @@ func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 	}
 	TargetServer.Mutex.Unlock()
 }
-// TODO: Implement round robin function here. It will redirect all incoming requests(to the load balancer) to the backend servers in a sequential manner.
-func RoundRobin(){
-	// 1. Keep track of current server
-	// 2. Route to current server and identify the next server
-	// 2.1 If the current server was the last in line, return the server counter to the 0-th index
-	// 2.2 Identify only up servers and skip the down servers when routing, i.e. if servers 1 and 3 are up, skip 2.
-	log.Println("The current server index is ", atomic.LoadUint32(&CurrentServerIdx))
-	FindNextServerIdx()
-	log.Println("The next server index is ", atomic.LoadUint32(&CurrentServerIdx))
 
+func RoundRobin(){
+	log.Println("The current server index is ", atomic.LoadUint32(&CurrentServerIdx))
+	LoadedHealthyServersList := LoadHealthyServersList()
+	if LoadedHealthyServersList != nil{
+		FindNextServerIdx()
+		NextServer := LoadedHealthyServersList[CurrentServerIdx]
+		log.Println(NextServer)
+		// TODO: Build the URL for the selected server and route to it
+	}
 
 }
 
 func FindNextServerIdx() {
-	TempHealthyServersList := HealthyServersList.Load()
-	if TempHealthyServersList != nil{
-		LoadedHealthyServersList, _ := TempHealthyServersList.([]*Server)
-
+	LoadedHealthyServersList := LoadHealthyServersList()
+	if LoadedHealthyServersList != nil{
 		if len(LoadedHealthyServersList) > 0{
 			var AtomicCurrentServerIdx = atomic.LoadUint32(&CurrentServerIdx)
 			var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
@@ -151,7 +149,15 @@ func FindNextServerIdx() {
 				atomic.AddUint32(&CurrentServerIdx, 1)
 			}
 		}
+	}
+}
+
+func LoadHealthyServersList() []*Server{
+	TempHealthyServersList := HealthyServersList.Load()
+	if TempHealthyServersList != nil{
+		LoadedHealthyServersList, _ := TempHealthyServersList.([]*Server)
+		return LoadedHealthyServersList
 	}else{
-		return
+		return nil
 	}
 }
