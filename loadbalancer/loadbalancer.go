@@ -10,6 +10,8 @@ import (
 	"time"
 	"encoding/json"
 	"sync/atomic"
+	"net/http/httputil"
+	"net/url"
 )
 
 type Server struct {
@@ -30,9 +32,27 @@ var CurrentServerIdx uint32 = 0
 
 func main() {
 	go func() {
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
-			RoundRobin()
-		})
+		OriginURL, Error := url.Parse("http://127.0.0.1:0")
+		if Error != nil{
+			log.Println(Error)
+		}
+		ReverseProxy := httputil.NewSingleHostReverseProxy(OriginURL)
+
+		OriginalDirector := ReverseProxy.Director
+		ReverseProxy.Director = func(req *http.Request){
+			OriginalDirector(req)
+			HealthyServers := LoadHealthyServersList()
+			if len(HealthyServers) > 0{
+				NextServer := HealthyServers[CurrentServerIdx]
+				req.URL.Scheme = "http"
+				req.URL.Host = fmt.Sprintf("%s:%d", NextServer.Host, NextServer.Port)
+				req.Host = req.URL.Host
+			}else{
+				log.Println("No servers up")
+			}
+		FindNextServerIdx()
+		}
+		http.Handle("/", ReverseProxy)
 		http.ListenAndServe(":8000", nil)
 	}()
 
@@ -123,19 +143,6 @@ func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 		TargetServer.IsUp = false
 	}
 	TargetServer.Mutex.Unlock()
-}
-
-func RoundRobin(){
-	log.Println("The current server index is ", atomic.LoadUint32(&CurrentServerIdx))
-	LoadedHealthyServersList := LoadHealthyServersList()
-	if LoadedHealthyServersList != nil && len(LoadedHealthyServersList) > 0{
-		FindNextServerIdx()
-		NextServer := LoadedHealthyServersList[CurrentServerIdx]
-		// TODO: Build the URL for the selected server and route to it
-		NextServerURL := fmt.Sprintf("http://%s:%d/", NextServer.Host, NextServer.Port)
-		log.Println(uri)
-	}
-
 }
 
 func FindNextServerIdx() {
