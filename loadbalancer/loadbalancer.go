@@ -47,7 +47,6 @@ func main() {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(ServersList))
 		for _, Server := range ServersList {
-			log.Println(Server)
 			go PerformHealthCheck(Server, wg)
 		}
 		wg.Wait()
