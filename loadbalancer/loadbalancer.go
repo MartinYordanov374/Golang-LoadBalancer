@@ -7,20 +7,12 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"sync/atomic"
 	"net/http/httputil"
 	"net/url"
 	"golang-loadbalancer/HelperFunctions"
 	"golang-loadbalancer/Structs"
+	"golang-loadbalancer/GlobalVariables"
 )
-
-
-var HealthyServersList atomic.Value
-var CurrentServerIdx uint32 = 0
-
-var HttpClient = &http.Client{
-	Timeout: 5*time.Second,
-}
 
 func main() {
 	go func() {
@@ -33,16 +25,16 @@ func main() {
 		OriginalDirector := ReverseProxy.Director
 		ReverseProxy.Director = func(req *http.Request){
 			OriginalDirector(req)
-			HealthyServers := LoadHealthyServersList()
+			HealthyServers := HelperFunctions.LoadHealthyServersList()
 			if len(HealthyServers) > 0{
-				NextServer := HealthyServers[CurrentServerIdx]
+				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx]
 				req.URL.Scheme = "http"
 				req.URL.Host = fmt.Sprintf("%s:%d", NextServer.Host, NextServer.Port)
 				req.Host = req.URL.Host
 			}else{
 				log.Println("No servers up")
 			}
-		FindNextServerIdx()
+		HelperFunctions.FindNextServerIdx()
 		}
 		http.Handle("/", ReverseProxy)
 		http.ListenAndServe(":8000", nil)
@@ -68,20 +60,17 @@ func main() {
 			}
 			CurrentServer.Mutex.Unlock()
 		}
-		HealthyServersList.Store(UpServersList)
+		GlobalVariables.HealthyServersList.Store(UpServersList)
 	}
 
 }
-
-
-
 func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup){
 
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
-	resp, err := HttpClient.Get(uri)
+	resp, err := GlobalVariables.HttpClient.Get(uri)
 	if err != nil {
-		UpdateServerHealthState(TargetServer, 503)
+		HelperFunctions.UpdateServerHealthState(TargetServer, 503)
 		return
 	}
 	defer resp.Body.Close()
@@ -92,44 +81,6 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup)
 		return
 	}else{
 		ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
-		UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
-	}
-}
-
-
-
-func UpdateServerHealthState(TargetServer *Structs.Server, StatusCode int){
-	// TODO: Rewrite this to use atomic values instead of mutex as apparently atomics introduce less overhead than mutexes
-	TargetServer.Mutex.Lock()
-	if StatusCode == 200{
-		TargetServer.IsUp = true
-	}else{
-		TargetServer.IsUp = false
-	}
-	TargetServer.Mutex.Unlock()
-}
-
-func FindNextServerIdx() {
-	LoadedHealthyServersList := LoadHealthyServersList()
-	if LoadedHealthyServersList != nil{
-		if len(LoadedHealthyServersList) > 0{
-			var AtomicCurrentServerIdx = atomic.LoadUint32(&CurrentServerIdx)
-			var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
-			if AtomicCurrentServerIdx+1 > AtomicHealthyServersListEndIdx{
-				atomic.StoreUint32(&CurrentServerIdx, 0)
-			}else{
-				atomic.AddUint32(&CurrentServerIdx, 1)
-			}
-		}
-	}
-}
-
-func LoadHealthyServersList() []*Structs.Server{
-	TempHealthyServersList := HealthyServersList.Load()
-	if TempHealthyServersList != nil{
-		LoadedHealthyServersList, _ := TempHealthyServersList.([]*Structs.Server)
-		return LoadedHealthyServersList
-	}else{
-		return nil
+		HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
 	}
 }
