@@ -2,17 +2,12 @@ package HelperFunctions
 
 import(
 	"encoding/json"
+	"golang-loadbalancer/Structs"
 )
 
-type HealthCheckEndpointResponse struct {
-	StatusCode int `json:"StatusCode"`
-	Message string	`json:"Message"`
-}
+func ParseJSONResponse(JSONResponse []byte) Structs.HealthCheckEndpointResponse {
 
-func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
-
-	var ParsedJSON HealthCheckEndpointResponse
+	var ParsedJSON Structs.HealthCheckEndpointResponse
 	json.Unmarshal([]byte(JSONResponse), &ParsedJSON)
 	return ParsedJSON
 }
-

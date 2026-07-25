@@ -11,3 +11,8 @@ type Server struct {
 	IsUp bool
 	Mutex sync.RWMutex
 }
+
+type HealthCheckEndpointResponse struct {
+	StatusCode int `json:"StatusCode"`
+	Message string	`json:"Message"`
+}
