@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"encoding/json"
 	"sync/atomic"
 	"net/http/httputil"
 	"net/url"
+	"golang-loadbalancer/HelperFunctions"
 )
 
 type Server struct {
@@ -22,10 +22,7 @@ type Server struct {
 	Mutex sync.RWMutex
 }
 
-type HealthCheckEndpointResponse struct {
-	StatusCode int `json:"StatusCode"`
-	Message string	`json:"Message"`
-}
+
 
 var HealthyServersList atomic.Value
 var CurrentServerIdx uint32 = 0
@@ -115,7 +112,6 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup){
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
 	resp, err := HttpClient.Get(uri)
-	log.Println(resp)
 	if err != nil {
 		UpdateServerHealthState(TargetServer, 503)
 		return
@@ -127,17 +123,12 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup){
 		log.Println(err)
 		return
 	}else{
-		ParsedJSON := ParseJSONResponse(jsonbody)
+		ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
 		UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
 	}
 }
 
-func ParseJSONResponse(JSONResponse []byte) HealthCheckEndpointResponse {
 
-	var ParsedJSON HealthCheckEndpointResponse
-	json.Unmarshal([]byte(JSONResponse), &ParsedJSON)
-	return ParsedJSON
-}
 
 func UpdateServerHealthState(TargetServer *Server, StatusCode int){
 	// TODO: Rewrite this to use atomic values instead of mutex as apparently atomics introduce less overhead than mutexes
