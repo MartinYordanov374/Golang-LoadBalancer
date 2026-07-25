@@ -30,6 +30,10 @@ type HealthCheckEndpointResponse struct {
 var HealthyServersList atomic.Value
 var CurrentServerIdx uint32 = 0
 
+var HttpClient = &http.Client{
+	Timeout: 5*time.Second,
+}
+
 func main() {
 	go func() {
 		OriginURL, Error := url.Parse("http://127.0.0.1:0")
@@ -110,7 +114,8 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup){
 
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
-	resp, err := http.Get(uri)
+	resp, err := HttpClient.Get(uri)
+	log.Println(resp)
 	if err != nil {
 		UpdateServerHealthState(TargetServer, 503)
 		return
