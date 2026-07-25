@@ -9,7 +9,7 @@ import(
 func main(){
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
-		fmt.Fprintf(w, "Server 1 is running")
+		fmt.Println("Server 1 is up")
 	})
 
 	http.HandleFunc("/health", endpoints.HealthCheck)

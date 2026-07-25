@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
@@ -12,16 +11,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"golang-loadbalancer/HelperFunctions"
+	"golang-loadbalancer/Structs"
 )
-
-type Server struct {
-	ID   string
-	Host string
-	Port int
-	IsUp bool
-	Mutex sync.RWMutex
-}
-
 
 
 var HealthyServersList atomic.Value
@@ -57,18 +48,19 @@ func main() {
 		http.ListenAndServe(":8000", nil)
 	}()
 
-	ServersList := InitializeServersList()
+	ServersList := HelperFunctions.InitializeServersList()
 
 	ticker := time.NewTicker(5 * time.Second)
 	for range ticker.C {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(ServersList))
 		for _, Server := range ServersList {
+			log.Println(Server)
 			go PerformHealthCheck(Server, wg)
 		}
 		wg.Wait()
 
-		UpServersList := make([]*Server, 0)
+		UpServersList := make([]*Structs.Server, 0)
 		for _, CurrentServer := range ServersList{
 			CurrentServer.Mutex.Lock()
 			if CurrentServer.IsUp{
@@ -81,33 +73,9 @@ func main() {
 
 }
 
-func InitializeServersList() []*Server {
-	// TODO: Automate the initialization process
-	Servers := []*Server{}
 
-	Servers = append(Servers, &Server{
-		ID:   uuid.New().String(),
-		Host: "localhost",
-		Port: 8080,
-		IsUp: false})
 
-	Servers = append(Servers, &Server{
-		ID:   uuid.New().String(),
-		Host: "localhost",
-		Port: 8081,
-		IsUp: false})
-
-	Servers = append(Servers, &Server{
-		ID:   uuid.New().String(),
-		Host: "localhost",
-		Port: 8082,
-		IsUp: false})
-
-	return Servers
-
-}
-
-func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup){
+func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup){
 
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
@@ -130,7 +98,7 @@ func PerformHealthCheck(TargetServer *Server, WaitGroup *sync.WaitGroup){
 
 
 
-func UpdateServerHealthState(TargetServer *Server, StatusCode int){
+func UpdateServerHealthState(TargetServer *Structs.Server, StatusCode int){
 	// TODO: Rewrite this to use atomic values instead of mutex as apparently atomics introduce less overhead than mutexes
 	TargetServer.Mutex.Lock()
 	if StatusCode == 200{
@@ -156,10 +124,10 @@ func FindNextServerIdx() {
 	}
 }
 
-func LoadHealthyServersList() []*Server{
+func LoadHealthyServersList() []*Structs.Server{
 	TempHealthyServersList := HealthyServersList.Load()
 	if TempHealthyServersList != nil{
-		LoadedHealthyServersList, _ := TempHealthyServersList.([]*Server)
+		LoadedHealthyServersList, _ := TempHealthyServersList.([]*Structs.Server)
 		return LoadedHealthyServersList
 	}else{
 		return nil
