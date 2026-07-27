@@ -12,6 +12,24 @@ func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.Prome
 			Name: "total_requests",
 			Help: "The total requests sent toward the load balancer",
 		}),
+		LoadBalancerResponseLatency: promauto.with(PrometheusRegistry).NewHistogram(prometheus.HistogramOpts{
+			Namespace: "golang-loadbalancer",
+			Name: "loadbalancer_response_latency",
+			Help: "The latency of the responses returned from the loadbalancer",
+			Buckets: []float64{
+				0.005,
+				0.01,
+				0.025,
+				0.05,
+				0.1,
+				0.25,
+				0.5,
+				1.0,
+				2.5,
+				5.0,
+				10.0,
+			},
+		}),
 	}
 	return CustomMetrics
 }
