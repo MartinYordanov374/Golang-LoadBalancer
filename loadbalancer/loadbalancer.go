@@ -12,19 +12,31 @@ import (
 	"golang-loadbalancer/HelperFunctions"
 	"golang-loadbalancer/Structs"
 	"golang-loadbalancer/GlobalVariables"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func main() {
+type metrics struct {
+	TotalRequests prometheus.Counter
+}
+func main(){
+
 	go func() {
 		OriginURL, Error := url.Parse("http://127.0.0.1:0")
 		if Error != nil{
 			log.Println(Error)
 		}
-		ReverseProxy := httputil.NewSingleHostReverseProxy(OriginURL)
 
+		PrometheusRegistry := prometheus.NewRegistry()
+		CustomMetrics := SetUpCustomMetrics(PrometheusRegistry)
+		http.Handle("/metrics", promhttp.HandlerFor(PrometheusRegistry, promhttp.HandlerOpts{}))
+
+		ReverseProxy := httputil.NewSingleHostReverseProxy(OriginURL)
 		OriginalDirector := ReverseProxy.Director
 		ReverseProxy.Director = func(req *http.Request){
 			OriginalDirector(req)
+			CustomMetrics.TotalRequests.Inc()
 			HealthyServers := HelperFunctions.LoadHealthyServersList()
 			if len(HealthyServers) > 0{
 				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx]
@@ -41,7 +53,6 @@ func main() {
 	}()
 
 	ServersList := HelperFunctions.InitializeServersList()
-
 	ticker := time.NewTicker(5 * time.Second)
 	for range ticker.C {
 		wg := new(sync.WaitGroup)
@@ -50,7 +61,6 @@ func main() {
 			go PerformHealthCheck(Server, wg)
 		}
 		wg.Wait()
-
 		UpServersList := make([]*Structs.Server, 0)
 		for _, CurrentServer := range ServersList{
 			CurrentServer.Mutex.Lock()
@@ -61,10 +71,9 @@ func main() {
 		}
 		GlobalVariables.HealthyServersList.Store(UpServersList)
 	}
-
 }
-func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup){
 
+func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup){
 	defer WaitGroup.Done()
 	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
 	resp, err := GlobalVariables.HttpClient.Get(uri)
@@ -73,7 +82,6 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup)
 		return
 	}
 	defer resp.Body.Close()
-
 	jsonbody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
@@ -82,4 +90,20 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup)
 		ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
 		HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
 	}
+}
+
+func SetUpPrometheus(){
+	PrometheusRegistry := prometheus.NewRegistry()
+	http.Handle("/metrics", promhttp.HandlerFor(PrometheusRegistry, promhttp.HandlerOpts{}))
+}
+
+func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *metrics{
+	CustomMetrics := &metrics{
+		TotalRequests: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
+			Namespace: "golang-loadbalancer",
+			Name: "total_requests",
+			Help: "The total requests sent toward the load balancer",
+		}),
+	}
+	return CustomMetrics
 }
