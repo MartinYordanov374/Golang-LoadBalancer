@@ -10,10 +10,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"golang-loadbalancer/HelperFunctions"
-	"golang-loadbalancer/Structs"
-	"golang-loadbalancer/GlobalVariables"
+  	"golang-loadbalancer/Structs"
+    "golang-loadbalancer/GlobalVariables"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -27,7 +26,7 @@ func main(){
 		}
 
 		PrometheusRegistry := prometheus.NewRegistry()
-		CustomMetrics := SetUpCustomMetrics(PrometheusRegistry)
+		CustomMetrics := HelperFunctions.SetUpCustomMetrics(PrometheusRegistry)
 		http.Handle("/metrics", promhttp.HandlerFor(PrometheusRegistry, promhttp.HandlerOpts{}))
 
 		ReverseProxy := httputil.NewSingleHostReverseProxy(OriginURL)
@@ -88,20 +87,4 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup)
 		ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
 		HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
 	}
-}
-
-func SetUpPrometheus(){
-	PrometheusRegistry := prometheus.NewRegistry()
-	http.Handle("/metrics", promhttp.HandlerFor(PrometheusRegistry, promhttp.HandlerOpts{}))
-}
-
-func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.PrometheusMetrics{
-	CustomMetrics := &Structs.PrometheusMetrics{
-		TotalRequests: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
-			Namespace: "golang-loadbalancer",
-			Name: "total_requests",
-			Help: "The total requests sent toward the load balancer",
-		}),
-	}
-	return CustomMetrics
 }
