@@ -17,9 +17,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type metrics struct {
-	TotalRequests prometheus.Counter
-}
+
 func main(){
 
 	go func() {
@@ -97,8 +95,8 @@ func SetUpPrometheus(){
 	http.Handle("/metrics", promhttp.HandlerFor(PrometheusRegistry, promhttp.HandlerOpts{}))
 }
 
-func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *metrics{
-	CustomMetrics := &metrics{
+func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.PrometheusMetrics{
+	CustomMetrics := &Structs.PrometheusMetrics{
 		TotalRequests: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
 			Namespace: "golang-loadbalancer",
 			Name: "total_requests",
