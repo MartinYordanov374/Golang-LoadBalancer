@@ -36,10 +36,13 @@ func main(){
 			CustomMetrics.TotalRequests.Inc()
 			HealthyServers := HelperFunctions.LoadHealthyServersList()
 			if len(HealthyServers) > 0{
+				RequestStartTime := time.Now()
 				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx]
 				req.URL.Scheme = "http"
 				req.URL.Host = fmt.Sprintf("%s:%d", NextServer.Host, NextServer.Port)
 				req.Host = req.URL.Host
+				RequestEndTime := time.Since(RequestStartTime).Seconds()
+				CustomMetrics.LoadBalancerResponseLatency.Observe(RequestEndTime)
 			}else{
 				log.Println("No servers up")
 			}
