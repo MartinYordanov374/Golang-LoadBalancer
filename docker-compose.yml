@@ -1,33 +1,39 @@
 services:
     loadbalancer:
+        container_name: "LoadBalancer"
         build:
             context: .
             dockerfile: ./loadbalancer/Dockerfile
         ports:
             - "8000:8000"
     serverone:
+        container_name: "ServerOne"
         build:
             context: .
             dockerfile: ./server1/Dockerfile
         ports:
             - "8080:8080"
     servertwo:
+        container_name: "ServerTwo"
         build:
             context: .
             dockerfile: ./server2/Dockerfile
         ports:
             - "8081:8081"
     serverthree:
+        container_name: "ServerThree"
         build:
             context: .
             dockerfile: ./server3/Dockerfile
         ports:
             - "8082:8082"
     prometheus:
+        container_name: "Prometheus"
         image: prom/prometheus:latest
         ports:
             - "9090:9090"
     grafana:
+        container_name: "Grafana"
         image: grafana/grafana:latest
         ports:
             - "3000:3000"
