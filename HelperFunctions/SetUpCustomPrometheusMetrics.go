@@ -8,12 +8,10 @@ import (
 func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.PrometheusMetrics{
 	CustomMetrics := &Structs.PrometheusMetrics{
 		TotalRequests: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
-			Namespace: "golang-loadbalancer",
 			Name: "total_requests",
 			Help: "The total requests sent toward the load balancer",
 		}),
 		LoadBalancerResponseLatency: promauto.With(PrometheusRegistry).NewHistogram(prometheus.HistogramOpts{
-			Namespace: "golang-loadbalancer",
 			Name: "loadbalancer_response_latency",
 			Help: "The latency of the responses returned from the loadbalancer",
 			Buckets: []float64{
