@@ -12,19 +12,19 @@ func InitializeServersList() []*Structs.Server {
 
 	Servers = append(Servers, &Structs.Server{
 		ID:   uuid.New().String(),
-		Host: "localhost",
+		Host: "serverone",
 		Port: 8080,
 		IsUp: false})
 
 	Servers = append(Servers, &Structs.Server{
 		ID:   uuid.New().String(),
-		Host: "localhost",
+		Host: "servertwo",
 		Port: 8081,
 		IsUp: false})
 
 	Servers = append(Servers, &Structs.Server{
 		ID:   uuid.New().String(),
-		Host: "localhost",
+		Host: "serverthree",
 		Port: 8082,
 		IsUp: false})
 
