@@ -5,7 +5,7 @@ import (
 	"log"
 )
 func HandleServerDownCounter(TargetServer *Structs.Server){
-		if TargetServer.DownCount.Load() > 5{
+		if TargetServer.DownCount.Load() == 5{
 			log.Println("Skipping server ", TargetServer.Port)
 			// TODO: Figure out how to count the time until the server
 			// will be back to the scanning list
