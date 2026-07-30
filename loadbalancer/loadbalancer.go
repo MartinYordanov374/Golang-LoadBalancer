@@ -46,7 +46,7 @@ func main(){
 			}else{
 				log.Println("No servers up")
 			}
-		HelperFunctions.FindNextServerIdx()
+			HelperFunctions.FindNextServerIdx()
 		}
 		http.Handle("/", ReverseProxy)
 		http.ListenAndServe(":8000", nil)
@@ -66,6 +66,15 @@ func main(){
 			CurrentServer.Mutex.Lock()
 			if CurrentServer.IsUp.Load() == true{
 				UpServersList = append(UpServersList, CurrentServer)
+			}else{
+				if CurrentServer.IsInCooldown.Load() == true{
+					if time.Now().After(CurrentServer.CooldownEndTimeStamp){
+						log.Println("The cooldown for this server is over")
+						CurrentServer.CooldownEndTimeStamp = time.Time{}
+						CurrentServer.IsInCooldown.Store(false)
+						UpServersList = append(UpServersList, CurrentServer)
+					}
+				}
 			}
 			CurrentServer.Mutex.Unlock()
 		}
@@ -75,19 +84,23 @@ func main(){
 
 func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup){
 	defer WaitGroup.Done()
-	uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
-	resp, err := GlobalVariables.HttpClient.Get(uri)
-	if err != nil {
-		HelperFunctions.UpdateServerHealthState(TargetServer, 503)
-		return
-	}
-	defer resp.Body.Close()
-	jsonbody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-		return
-	}else{
-		ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
-		HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
+	if !TargetServer.IsInCooldown.Load(){
+		uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
+		log.Println(uri)
+		resp, err := GlobalVariables.HttpClient.Get(uri)
+		if err != nil {
+			log.Println(err)
+			HelperFunctions.UpdateServerHealthState(TargetServer, 503)
+			return
+		}
+		defer resp.Body.Close()
+		jsonbody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+			return
+		}else{
+			ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
+			HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
+		}
 	}
 }
