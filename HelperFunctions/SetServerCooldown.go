@@ -7,7 +7,7 @@ import (
 )
 func SetServerScanningCooldown(TargetServer *Structs.Server){
 	CurrentTimeStamp:= time.Now()
-	CooldownDurationInMinutes := 1*time.Minute
+	CooldownDurationInMinutes := 5*time.Minute
 	CooldownEndTimeStamp := CurrentTimeStamp.Add(CooldownDurationInMinutes)
 	TargetServer.Mutex.Lock()
 	TargetServer.CooldownEndTimeStamp = CooldownEndTimeStamp
