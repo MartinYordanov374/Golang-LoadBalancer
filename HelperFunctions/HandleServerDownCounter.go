@@ -10,6 +10,7 @@ func HandleServerDownCounter(TargetServer *Structs.Server){
 			// TODO: Figure out how to count the time until the server
 			// will be back to the scanning list
 			TargetServer.IsInCooldown.Store(true)
+			SetServerScanningCooldown(TargetServer)
 			TargetServer.DownCount.Store(0)
 			return;
 		}else{
