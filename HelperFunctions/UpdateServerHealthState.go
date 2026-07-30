@@ -9,6 +9,7 @@ func UpdateServerHealthState(TargetServer *Structs.Server, StatusCode int){
 		TargetServer.IsUp = true
 	}else{
 		TargetServer.IsUp = false
+		TargetServer.DownCount.Add(1)
 	}
 	TargetServer.Mutex.Unlock()
 }

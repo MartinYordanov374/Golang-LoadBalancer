@@ -3,6 +3,7 @@ package Structs
 import (
 	"sync"
 	"github.com/prometheus/client_golang/prometheus"
+	"sync/atomic"
 )
 
 type Server struct {
@@ -11,6 +12,7 @@ type Server struct {
 	Port int
 	IsUp bool
 	Mutex sync.RWMutex
+	DownCount atomic.Uint32
 }
 
 type HealthCheckEndpointResponse struct {

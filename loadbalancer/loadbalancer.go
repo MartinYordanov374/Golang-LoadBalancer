@@ -79,6 +79,7 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup)
 	resp, err := GlobalVariables.HttpClient.Get(uri)
 	if err != nil {
 		HelperFunctions.UpdateServerHealthState(TargetServer, 503)
+		HelperFunctions.HandleServerDownCounter(TargetServer)
 		return
 	}
 	defer resp.Body.Close()
