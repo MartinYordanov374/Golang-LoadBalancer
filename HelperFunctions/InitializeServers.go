@@ -1,7 +1,6 @@
 package HelperFunctions
 
 import (
-	"github.com/google/uuid"
 	"golang-loadbalancer/Structs"
 )
 
@@ -11,22 +10,16 @@ func InitializeServersList() []*Structs.Server {
 	Servers := []*Structs.Server{}
 
 	Servers = append(Servers, &Structs.Server{
-		ID:   uuid.New().String(),
 		Host: "serverone",
-		Port: 8080,
-		IsUp: false})
+		Port: 8080})
 
 	Servers = append(Servers, &Structs.Server{
-		ID:   uuid.New().String(),
 		Host: "servertwo",
-		Port: 8081,
-		IsUp: false})
+		Port: 8081})
 
 	Servers = append(Servers, &Structs.Server{
-		ID:   uuid.New().String(),
 		Host: "serverthree",
-		Port: 8082,
-		IsUp: false})
+		Port: 8082})
 
 	return Servers
 

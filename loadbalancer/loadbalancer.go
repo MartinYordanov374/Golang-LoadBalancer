@@ -64,7 +64,7 @@ func main(){
 		UpServersList := make([]*Structs.Server, 0)
 		for _, CurrentServer := range ServersList{
 			CurrentServer.Mutex.Lock()
-			if CurrentServer.IsUp{
+			if CurrentServer.IsUp.Load() == true{
 				UpServersList = append(UpServersList, CurrentServer)
 			}
 			CurrentServer.Mutex.Unlock()
@@ -79,7 +79,6 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup)
 	resp, err := GlobalVariables.HttpClient.Get(uri)
 	if err != nil {
 		HelperFunctions.UpdateServerHealthState(TargetServer, 503)
-		HelperFunctions.HandleServerDownCounter(TargetServer)
 		return
 	}
 	defer resp.Body.Close()

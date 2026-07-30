@@ -10,9 +10,11 @@ type Server struct {
 	ID   string
 	Host string
 	Port int
-	IsUp bool
+	IsUp atomic.Bool
 	Mutex sync.RWMutex
 	DownCount atomic.Uint32
+	IsInCooldown atomic.Bool
+
 }
 
 type HealthCheckEndpointResponse struct {
