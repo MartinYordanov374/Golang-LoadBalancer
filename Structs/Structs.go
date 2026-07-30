@@ -26,7 +26,7 @@ type PrometheusMetrics struct {
 	LoadBalancerResponseLatency prometheus.Histogram
 	BackendsCount prometheus.Counter
 	HealthyBackendsCount prometheus.Gauge
-	BackendDowntimeDuration prometheus.Histogram
+	BackendDowntimeDuration *prometheus.HistogramVec
 	TotalHealthCheckFailures prometheus.Counter
-	BackendHealthCheckFailures prometheus.Counter
+	BackendHealthCheckFailures *prometheus.CounterVec
 }

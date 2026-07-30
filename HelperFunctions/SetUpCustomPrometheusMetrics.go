@@ -28,6 +28,28 @@ func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.Prome
 				10.0,
 			},
 		}),
+		BackendsCount: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
+			Name: "total_backends_count",
+			Help: "The total amount of backends that the load balancer is routing to",
+		}),
+		HealthyBackendsCount: promauto.With(PrometheusRegistry).NewGauge(prometheus.GaugeOpts{
+			Name: "healthy_backends_count",
+			Help: "The amount of backends that the health check succeeded for",
+		}),
+		BackendDowntimeDuration: promauto.With(PrometheusRegistry).NewHistogramVec(prometheus.HistogramOpts{
+			Name: "backend_downtime_duration",
+			Help: "The amount of time which a backend has been down for",
+		},
+		[]string{"backend"}),
+		TotalHealthCheckFailures: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
+			Name: "total_healthcheck_failures",
+			Help: "The total amount of healtchecks that have failed, i.e. server was not detected as running",
+		}),
+		BackendHealthCheckFailures: promauto.With(PrometheusRegistry).NewCounterVec(prometheus.CounterOpts{
+			Name: "backend_healthcheck_failures",
+			Help: "The total amount of times a specific backend has failed health checks",
+		},
+		[]string{"backend"}),
 	}
 	return CustomMetrics
 }
