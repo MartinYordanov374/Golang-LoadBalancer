@@ -1,18 +1,17 @@
 package HelperFunctions
 import(
 	"golang-loadbalancer/GlobalVariables"
-	"sync/atomic"
 )
 func FindNextServerIdx() {
 	LoadedHealthyServersList := LoadHealthyServersList()
 	if LoadedHealthyServersList != nil{
 		if len(LoadedHealthyServersList) > 0{
-			var AtomicCurrentServerIdx = atomic.LoadUint32(&GlobalVariables.CurrentServerIdx)
+			var AtomicCurrentServerIdx = GlobalVariables.CurrentServerIdx
 			var AtomicHealthyServersListEndIdx = uint32(len(LoadedHealthyServersList)-1)
-			if AtomicCurrentServerIdx+1 > AtomicHealthyServersListEndIdx{
-				atomic.StoreUint32(&GlobalVariables.CurrentServerIdx, 0)
+			if AtomicCurrentServerIdx.Load()+1 > AtomicHealthyServersListEndIdx{
+				AtomicCurrentServerIdx.Store(0)
 			}else{
-				atomic.AddUint32(&GlobalVariables.CurrentServerIdx, 1)
+				AtomicCurrentServerIdx.Add(1)
 			}
 		}
 	}

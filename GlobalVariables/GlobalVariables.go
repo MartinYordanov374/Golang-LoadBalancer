@@ -5,7 +5,7 @@ import(
 	"net/http"
 )
 var HealthyServersList atomic.Value
-var CurrentServerIdx uint32 = 0 
+var CurrentServerIdx atomic.Uint32
 var HttpClient = &http.Client{
 	Timeout: 5*time.Second,
 }

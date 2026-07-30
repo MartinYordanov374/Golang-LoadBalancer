@@ -37,7 +37,7 @@ func main(){
 			HealthyServers := HelperFunctions.LoadHealthyServersList()
 			if len(HealthyServers) > 0{
 				RequestStartTime := time.Now()
-				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx]
+				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx.Load()]
 				req.URL.Scheme = "http"
 				req.URL.Host = fmt.Sprintf("%s:%d", NextServer.Host, NextServer.Port)
 				req.Host = req.URL.Host
