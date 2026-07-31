@@ -33,7 +33,6 @@ func main(){
 			OriginalDirector(req)
 			CustomMetrics.TotalRequests.Inc()
 			HealthyServers := HelperFunctions.LoadHealthyServersList()
-			CustomMetrics.HealthyBackendsCount.Set(float64(len(HealthyServers)))
 			if len(HealthyServers) > 0{
 				RequestStartTime := time.Now()
 				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx.Load()]
@@ -80,6 +79,7 @@ func main(){
 				BackendDowntimeDuration := time.Since(CurrentServer.CooldownStartTimeStamp).Seconds()
 				CustomMetrics.BackendDowntimeDuration.WithLabelValues(CurrentServer.PrometheusLabel).Observe(BackendDowntimeDuration)
 			}
+			CustomMetrics.HealthyBackendsCount.Set(float64(len(UpServersList)))
 			CurrentServer.Mutex.Unlock()
 		}
 		GlobalVariables.HealthyServersList.Store(UpServersList)
