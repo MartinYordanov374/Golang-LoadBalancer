@@ -24,7 +24,7 @@ type HealthCheckEndpointResponse struct {
 type PrometheusMetrics struct {
 	TotalRequests prometheus.Counter
 	LoadBalancerResponseLatency prometheus.Histogram
-	BackendsCount prometheus.Counter
+	BackendsCount prometheus.Gauge
 	HealthyBackendsCount prometheus.Gauge
 	BackendDowntimeDuration *prometheus.HistogramVec
 	TotalHealthCheckFailures prometheus.Counter

@@ -28,7 +28,7 @@ func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.Prome
 				10.0,
 			},
 		}),
-		BackendsCount: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
+		BackendsCount: promauto.With(PrometheusRegistry).NewGauge(prometheus.GaugeOpts{
 			Name: "total_backends_count",
 			Help: "The total amount of backends that the load balancer is routing to",
 		}),

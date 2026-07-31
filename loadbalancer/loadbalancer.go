@@ -35,6 +35,7 @@ func main(){
 			OriginalDirector(req)
 			CustomMetrics.TotalRequests.Inc()
 			HealthyServers := HelperFunctions.LoadHealthyServersList()
+			CustomMetrics.BackendsCount.Set(len(HealthyServers))
 			if len(HealthyServers) > 0{
 				RequestStartTime := time.Now()
 				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx.Load()]
