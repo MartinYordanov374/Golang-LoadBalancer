@@ -75,6 +75,10 @@ func main(){
 						UpServersList = append(UpServersList, CurrentServer)
 					}
 				}
+
+				// TODO: Review the units of measure again
+				BackendDowntimeDuration := time.Since(CurrentServer.CooldownStartTimeStamp).Seconds()
+				CustomMetrics.BackendDowntimeDuration.WithLabelValues(CurrentServer.PrometheusLabel).Observe(BackendDowntimeDuration)
 			}
 			CurrentServer.Mutex.Unlock()
 		}
@@ -86,10 +90,8 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup)
 	defer WaitGroup.Done()
 	if !TargetServer.IsInCooldown.Load(){
 		uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
-		log.Println(uri)
 		resp, err := GlobalVariables.HttpClient.Get(uri)
 		if err != nil {
-			log.Println(err)
 			HelperFunctions.UpdateServerHealthState(TargetServer, 503)
 			return
 		}
