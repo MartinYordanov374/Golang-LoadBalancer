@@ -94,6 +94,7 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup,
 		if err != nil {
 			HelperFunctions.UpdateServerHealthState(TargetServer, 503)
 			CustomMetrics.TotalHealthCheckFailures.Inc()
+			CustomMetrics.BackendHealthCheckFailures.WithLabelValues(TargetServer.PrometheusLabel).Inc()
 			return
 		}
 		defer resp.Body.Close()
