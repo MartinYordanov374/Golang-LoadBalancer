@@ -3,7 +3,6 @@ package HelperFunctions
 import (
 	"golang-loadbalancer/Structs"
 	"time"
-	"log"
 )
 func SetServerScanningCooldown(TargetServer *Structs.Server){
 	CurrentTimeStamp:= time.Now()
@@ -11,6 +10,6 @@ func SetServerScanningCooldown(TargetServer *Structs.Server){
 	CooldownEndTimeStamp := CurrentTimeStamp.Add(CooldownDurationInMinutes)
 	TargetServer.Mutex.Lock()
 	TargetServer.CooldownEndTimeStamp = CooldownEndTimeStamp
+	TargetServer.CooldownStartTimeStamp = CurrentTimeStamp
 	TargetServer.Mutex.Unlock()
-	log.Println("Cooldown set for server on port, ", TargetServer.Port)
 }

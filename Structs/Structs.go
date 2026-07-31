@@ -15,6 +15,7 @@ type Server struct {
 	DownCount atomic.Uint32
 	IsInCooldown atomic.Bool
 	CooldownEndTimeStamp time.Time
+	CooldownStartTimeStamp time.Time
 	PrometheusLabel string
 }
 type HealthCheckEndpointResponse struct {
