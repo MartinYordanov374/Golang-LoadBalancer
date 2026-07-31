@@ -19,23 +19,21 @@ import (
 
 func main(){
 
+	PrometheusRegistry := prometheus.NewRegistry()
+	CustomMetrics := HelperFunctions.SetUpCustomMetrics(PrometheusRegistry)
+	http.Handle("/metrics", promhttp.HandlerFor(PrometheusRegistry, promhttp.HandlerOpts{}))
 	go func() {
 		OriginURL, Error := url.Parse("http://127.0.0.1:0")
 		if Error != nil{
 			log.Println(Error)
 		}
-
-		PrometheusRegistry := prometheus.NewRegistry()
-		CustomMetrics := HelperFunctions.SetUpCustomMetrics(PrometheusRegistry)
-		http.Handle("/metrics", promhttp.HandlerFor(PrometheusRegistry, promhttp.HandlerOpts{}))
-
 		ReverseProxy := httputil.NewSingleHostReverseProxy(OriginURL)
 		OriginalDirector := ReverseProxy.Director
 		ReverseProxy.Director = func(req *http.Request){
 			OriginalDirector(req)
 			CustomMetrics.TotalRequests.Inc()
 			HealthyServers := HelperFunctions.LoadHealthyServersList()
-			CustomMetrics.BackendsCount.Set(len(HealthyServers))
+			CustomMetrics.HealthyBackendsCount.Set(float64(len(HealthyServers)))
 			if len(HealthyServers) > 0{
 				RequestStartTime := time.Now()
 				NextServer := HealthyServers[GlobalVariables.CurrentServerIdx.Load()]
@@ -54,6 +52,7 @@ func main(){
 	}()
 
 	ServersList := HelperFunctions.InitializeServersList()
+	CustomMetrics.BackendsCount.Set(float64(len(ServersList)))
 	ticker := time.NewTicker(5 * time.Second)
 	for range ticker.C {
 		wg := new(sync.WaitGroup)
