@@ -2,7 +2,7 @@ package HelperFunctions
 import(
 	"golang-loadbalancer/Structs"
 )
-func UpdateServerHealthState(TargetServer *Structs.Server, StatusCode int){
+func UpdateServerHealthState(TargetServer *Structs.Server, StatusCode int, CustomMetrics *Structs.PrometheusMetrics){
 	// TODO: Rewrite this to use atomic values instead of mutex as apparently atomics introduce less overhead than mutexes
 	//TargetServer.Mutex.Lock()
 	if StatusCode == 200{
@@ -10,7 +10,7 @@ func UpdateServerHealthState(TargetServer *Structs.Server, StatusCode int){
 	}else{
 		TargetServer.IsUp.Store(false)
 		if !TargetServer.IsInCooldown.Load(){
-			HandleServerDownCounter(TargetServer)
+			HandleServerDownCounter(TargetServer, CustomMetrics)
 		}
 	}
 	//TargetServer.Mutex.Unlock()

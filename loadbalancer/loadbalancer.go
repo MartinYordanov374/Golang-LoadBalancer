@@ -70,6 +70,8 @@ func main(){
 						log.Println("The cooldown for this server is over")
 						CurrentServer.CooldownEndTimeStamp = time.Time{}
 						CurrentServer.IsInCooldown.Store(false)
+						CustomMetrics.BackendsOnCooldown.Sub(1)
+
 						UpServersList = append(UpServersList, CurrentServer)
 					}
 				}
@@ -91,7 +93,7 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup,
 		uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
 		resp, err := GlobalVariables.HttpClient.Get(uri)
 		if err != nil {
-			HelperFunctions.UpdateServerHealthState(TargetServer, 503)
+			HelperFunctions.UpdateServerHealthState(TargetServer, 503, CustomMetrics)
 			CustomMetrics.TotalHealthCheckFailures.Inc()
 			CustomMetrics.BackendHealthCheckFailures.WithLabelValues(TargetServer.PrometheusLabel).Inc()
 			return
@@ -103,7 +105,7 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup,
 			return
 		}else{
 			ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
-			HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
+			HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode, CustomMetrics)
 			CustomMetrics.TotalSuccessfulHealthChecks.Inc()
 		}
 	}
