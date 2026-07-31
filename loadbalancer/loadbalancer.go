@@ -58,7 +58,7 @@ func main(){
 		wg := new(sync.WaitGroup)
 		wg.Add(len(ServersList))
 		for _, Server := range ServersList {
-			go PerformHealthCheck(Server, wg)
+			go PerformHealthCheck(Server, wg, CustomMetrics)
 		}
 		wg.Wait()
 		UpServersList := make([]*Structs.Server, 0)
@@ -86,13 +86,14 @@ func main(){
 	}
 }
 
-func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup){
+func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup, CustomMetrics *Structs.PrometheusMetrics){
 	defer WaitGroup.Done()
 	if !TargetServer.IsInCooldown.Load(){
 		uri := fmt.Sprintf("http://%s:%d/health", TargetServer.Host, TargetServer.Port)
 		resp, err := GlobalVariables.HttpClient.Get(uri)
 		if err != nil {
 			HelperFunctions.UpdateServerHealthState(TargetServer, 503)
+			CustomMetrics.TotalHealthCheckFailures.Inc()
 			return
 		}
 		defer resp.Body.Close()
