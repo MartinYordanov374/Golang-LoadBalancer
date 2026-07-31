@@ -58,7 +58,7 @@ func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.Prome
 			Name: "total_healthcheck_successful",
 			Help: "The total amount of successful health checks",
 		}),
-		BackendCooldownsCounter: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
+		BackendCooldownsCounter: promauto.With(PrometheusRegistry).NewCounterVec(prometheus.CounterOpts{
 			Name: "backend_cooldowns_count",
 			Help: "The total amount of cooldowns that a backend was put on after repeatedly failing health checks",
 		},

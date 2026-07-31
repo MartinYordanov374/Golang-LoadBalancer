@@ -16,7 +16,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-
 func main(){
 
 	PrometheusRegistry := prometheus.NewRegistry()
@@ -105,6 +104,7 @@ func PerformHealthCheck(TargetServer *Structs.Server, WaitGroup *sync.WaitGroup,
 		}else{
 			ParsedJSON := HelperFunctions.ParseJSONResponse(jsonbody)
 			HelperFunctions.UpdateServerHealthState(TargetServer, ParsedJSON.StatusCode)
+			CustomMetrics.TotalSuccessfulHealthChecks.Inc()
 		}
 	}
 }
