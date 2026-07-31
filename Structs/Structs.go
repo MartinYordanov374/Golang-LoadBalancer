@@ -31,4 +31,7 @@ type PrometheusMetrics struct {
 	BackendDowntimeDuration *prometheus.HistogramVec
 	TotalHealthCheckFailures prometheus.Counter
 	BackendHealthCheckFailures *prometheus.CounterVec
+	BackendsOnCooldown prometheus.Gauge
+	TotalSuccessfulHealthChecks prometheus.Counter
+	BackendsCooldownsCounter prometheus.Counter
 }
