@@ -13,6 +13,7 @@ type Server struct {
 	IsUp atomic.Bool
 	Mutex sync.RWMutex
 	DownCount atomic.Uint32
+	WentDownTimeStamp time.Time
 	IsInCooldown atomic.Bool
 	CooldownEndTimeStamp time.Time
 	CooldownStartTimeStamp time.Time

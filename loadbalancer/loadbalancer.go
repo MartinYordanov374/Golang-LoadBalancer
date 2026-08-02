@@ -71,12 +71,7 @@ func main(){
 						CurrentServer.CooldownEndTimeStamp = time.Time{}
 						CurrentServer.IsInCooldown.Store(false)
 						CustomMetrics.BackendsOnCooldown.Sub(1)
-
 						UpServersList = append(UpServersList, CurrentServer)
-						// TODO: Review the units of measure again
-						BackendDowntimeDuration := time.Since(CurrentServer.CooldownStartTimeStamp).Seconds()
-						CustomMetrics.BackendDowntimeDuration.WithLabelValues(CurrentServer.PrometheusLabel).Observe(BackendDowntimeDuration)
-
 					}
 				}
 			}
