@@ -39,6 +39,19 @@ func SetUpCustomMetrics(PrometheusRegistry prometheus.Registerer) *Structs.Prome
 		BackendDowntimeDuration: promauto.With(PrometheusRegistry).NewHistogramVec(prometheus.HistogramOpts{
 			Name: "backend_downtime_duration",
 			Help: "The amount of time which a backend has been down for",
+			Buckets: []float64{
+				5,
+				10,
+				15,
+				20,
+				25,
+				30,
+				60,
+				80,
+				120,
+				240,
+				360,
+			},
 		},
 		[]string{"backend"}),
 		TotalHealthCheckFailures: promauto.With(PrometheusRegistry).NewCounter(prometheus.CounterOpts{
