@@ -73,12 +73,12 @@ func main(){
 						CustomMetrics.BackendsOnCooldown.Sub(1)
 
 						UpServersList = append(UpServersList, CurrentServer)
+						// TODO: Review the units of measure again
+						BackendDowntimeDuration := time.Since(CurrentServer.CooldownStartTimeStamp).Seconds()
+						CustomMetrics.BackendDowntimeDuration.WithLabelValues(CurrentServer.PrometheusLabel).Observe(BackendDowntimeDuration)
+
 					}
 				}
-
-				// TODO: Review the units of measure again
-				BackendDowntimeDuration := time.Since(CurrentServer.CooldownStartTimeStamp).Seconds()
-				CustomMetrics.BackendDowntimeDuration.WithLabelValues(CurrentServer.PrometheusLabel).Observe(BackendDowntimeDuration)
 			}
 			CustomMetrics.HealthyBackendsCount.Set(float64(len(UpServersList)))
 			CurrentServer.Mutex.Unlock()
