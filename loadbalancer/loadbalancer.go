@@ -51,7 +51,7 @@ func main(){
 
 	ServersList := HelperFunctions.InitializeServersList()
 	CustomMetrics.BackendsCount.Set(float64(len(ServersList)))
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(15 * time.Second)
 	for range ticker.C {
 		wg := new(sync.WaitGroup)
 		wg.Add(len(ServersList))
