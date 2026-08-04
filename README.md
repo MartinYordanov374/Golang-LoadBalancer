@@ -8,8 +8,9 @@ This project implements a static load balancer in **Go** based on the **Round Ro
 3. [Project Features](#Project-Features)
 4. [Tech Stack](#Tech-Stack)
 5. [Project Architecture](#Project-Architecture)
-6. [Grafana and Prometheus](#Grafana-and-Prometheus)
-7. [Getting Started](#Getting-Started)
+6. [Project Structure)[#Project-Structure)
+7. [Grafana and Prometheus](#Grafana-and-Prometheus)
+8. [Getting Started](#Getting-Started)
 
 
 # The motivation behind the project
@@ -31,6 +32,8 @@ The goals of the project were to build a loadbalancer with the Round Robin algor
 The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Compose**. 
 
 # Project Architecture
+
+# Project Structure
 
 # Grafana and Prometheus
 
