@@ -3,10 +3,7 @@ package HelperFunctions
 import (
 	"golang-loadbalancer/Structs"
 )
-
-
 func InitializeServersList() []*Structs.Server {
-	// TODO: Automate the initialization process
 	Servers := []*Structs.Server{}
 
 	Servers = append(Servers, &Structs.Server{
@@ -23,7 +20,5 @@ func InitializeServersList() []*Structs.Server {
 		PrometheusLabel:"ServerThree",
 		Host: "serverthree",
 		Port: 8082})
-
 	return Servers
-
 }
