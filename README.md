@@ -137,3 +137,4 @@ The Load Balancer is exposed on port 8000.
 The backend HTTP servers are on ports 8080, 8081, and 8082. 
 
 Grafana is on port 3000, and Prometheus is on port 9090.
+Note that I have not set up any custom credentials for Grafana, so you should be able to log in with the default credentials.
