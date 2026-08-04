@@ -111,6 +111,55 @@ The full tree structure is shown below:
     └── Structs.go
 ```
 # Grafana and Prometheus
+## Prometheus
+The project makes use of 10 custom Prometheus metrics defined in the *PrometheusMetrics* struct below:
+```
+type PrometheusMetrics struct {
+	TotalRequests prometheus.Counter
+	LoadBalancerResponseLatency prometheus.Histogram
+	BackendsCount prometheus.Gauge
+	HealthyBackendsCount prometheus.Gauge
+	BackendDowntimeDuration *prometheus.HistogramVec
+	TotalHealthCheckFailures prometheus.Counter
+	BackendHealthCheckFailures *prometheus.CounterVec
+	BackendsOnCooldown prometheus.Gauge
+	TotalSuccessfulHealthChecks prometheus.Counter
+	BackendCooldownsCounter *prometheus.GaugeVec
+}
+```
+You can find the Struct in the Structs directory.
+
+## Grafana
+The project employs a single Grafana dashboard that consist of 18 total panels:
+```
+        A p99 load balancer response latency time series panel
+        A p95 load balancer response latency time series panel
+        A p50 load balancer response latency time series panel
+        Requests per second toward the load balancer
+        Healthy Backends
+        Total Backends
+        Healthy / Total Backends Ratio
+        Total Health Check Failures
+        Backends on Cooldown
+        Backend One Cooldown Counter
+        Backend Two Cooldown Counter
+        Backend Three Cooldown Counter
+        Backend One Health Check Failures
+        Backend Two Health Check Failures
+        Backend Three Health Check Failures
+        Backend One p99/95/50 Downtime Duration
+        Backend Two p99/95/50 Downtime Duration
+        Backend Three p99/95/50 Downtime Duration
+```
+
+I created those panels because they make it easy to triangulate issues across the project and pinpoint the cause faster than it would be to manually go through the code and debug. Even though I am hosting this project locally, it still helped me pinpoint an issue with the downtime duration that I did not catch in the code because the diagrams had clear issues that did not make any mathematical sense when looking at them, i.e., having a downtime of 40+ years, while the actual downtime was no more than a minute.
+
+Screenshots from the Dashboard can be seen below.
+
+<img width="1914" height="927" alt="Screenshot From 2026-08-03 08-26-49" src="https://github.com/user-attachments/assets/10ca61dd-0dbc-4abe-89dc-c2ec212e94f9" />
+<img width="1914" height="927" alt="Screenshot From 2026-08-03 08-26-56" src="https://github.com/user-attachments/assets/310e2ac4-b08c-434c-9b7c-2466bb4ae104" />
+<img width="1914" height="927" alt="Screenshot From 2026-08-03 08-27-00" src="https://github.com/user-attachments/assets/8ec719a7-3ccc-475a-a03d-483570e96d5b" />
+
 
 # Getting Started
 
