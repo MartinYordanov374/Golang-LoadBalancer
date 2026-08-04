@@ -9,7 +9,7 @@ This project implements a static load balancer in **Go** based on the **Round Ro
 4. [Tech Stack](#Tech-Stack)
 5. [Project Architecture](#Project-Architecture)
 6. [Grafana and Prometheus](#Grafana-and-Prometheus)
-7. [Set Up Guide](#Set-up-guide)
+7. [Getting Started](#Getting-Started)
 
 
 # The motivation behind the project
@@ -34,4 +34,4 @@ The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Com
 
 # Grafana and Prometheus
 
-# Set Up Guide
+# Getting Started
