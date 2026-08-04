@@ -17,6 +17,13 @@ I wanted some more novelty and challenge in the down months between getting my b
 The goals of the project were to build a loadbalancer with the Round Robin algorithm and have most of the core load balancer functionalities preset, i.e. active health checks, skipping over down backends, request time outs, etc. I also wanted to pick up on some Go programming skills, which I believe I achieved. In addition, I wanted to dabble around with concurrency, which I found Go and this project to be perfect for. Finally, I wanted to practice my Prometheus and Grafana skills.
 
 # Project Features
+1. Active Health Checks  
+2. Round Robin Routing
+3. Request Timeouts
+4. Health Checks Cooldown
+5. Skipping Down Backends
+6. Atomic variables and operations
+7. Mutexes
 
 # Project Architecture
 
