@@ -34,7 +34,59 @@ The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Com
 # Project Architecture
 
 # Project Structure
+The project consists of the endpoints, HelperFunctions, Grafana, Prometheus, Server1, Server2, Server3, and Structs directories. 
 
+**The endpoints Directory** contains the function that returns the specified response upon a successful Health Check, otherwise status code 503 is returned.
+
+**The GlobalVariables Directory** contains the file from which the global variables are "taken".
+
+**The Grafana and Prometheus Directories** contain the usual Grafana and Prometheus configuration yml files.
+
+**The HelperFunctions Directory** contains all of the functions that the Load Balancer needs to execute during runtime. I tried to modularize the Load Balancer file as much as I could, while also keeping everything scalable and maintainable.
+
+**The LoadBalancer Directory** contains the Load Balancer source and the Dockerfile form which the docker image for the docker container is created.  
+
+**The Servers 1, 2, and 3 directories** are all identical with the exception that each server returns a different message to the user, i.e., "Server 1", "Server 2", or "Server 3", depending on which server the user is routed to.
+
+**The structs folder** contains all of the structs that are referenced in the rest of the code.
+
+The full tree structure is shown below:
+```
+├── docker-compose.yml
+├── endpoints
+│   └── healthcheck.go
+├── GlobalVariables
+│   └── GlobalVariables.go
+├── go.mod
+├── go.sum
+├── Grafana
+│   └── datasources.yml
+├── HelperFunctions
+│   ├── FindNextServerIdx.go
+│   ├── HandleServerDownCounter.go
+│   ├── InitializeServers.go
+│   ├── LoadHealthyServersList.go
+│   ├── ParseJSONResponse.go
+│   ├── SetServerCooldown.go
+│   ├── SetUpCustomPrometheusMetrics.go
+│   └── UpdateServerHealthState.go
+├── loadbalancer
+│   ├── Dockerfile
+│   └── loadbalancer.go
+├── prometheus
+│   └── prometheus.yml
+├── server1
+│   ├── Dockerfile
+│   └── server1.go
+├── server2
+│   ├── Dockerfile
+│   └── server2.go
+├── server3
+│   ├── Dockerfile
+│   └── server3.go
+└── Structs
+    └── Structs.go
+```
 # Grafana and Prometheus
 
 # Getting Started
