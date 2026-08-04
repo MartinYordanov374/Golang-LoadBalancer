@@ -107,7 +107,7 @@ First, navigate to your terminal and clone the project on your machine:
 
 Once the project is cloned, navigate to the repository:
 
-```cd GoLang-LoadBalancer ```
+```cd ./GoLang-LoadBalancer ```
 
 Run the Docker Compose command:
 
