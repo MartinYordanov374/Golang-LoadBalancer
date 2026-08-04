@@ -2,12 +2,14 @@
 This project implements a static load balancer in **Go** based on the **Round Robin** load balancing algorithm. The project features **active health checks** to the three custom backends every 15 seconds, **health check request timeouts** and **skipping over offline backends.** In addition, the project also features **Prometheus** instrumentation and monitoring in custom **Grafana dashboards**.
 ## Table of Contents
 
-1. [The motivation behind the project.](#The-motivation-behind-the-project)
+
+1. [The motivation behind the project](#The-motivation-behind-the-project)
 2. [What I strived to achieve and learn through this project](#What-I-strived-to-achieve-and-learn-through-this-project)
-3. [Project Features.](#Project-Features)
-4. [Project Architecture.](#Project-Architecture)
-5. [Grafana and Prometheus.](#Grafana-and-Prometheus)
-6. [Set Up Guide.](#Set-up-guide)
+3. [Project Features](#Project-Features)
+4. [Tech Stack](#Tech-Stack)
+5. [Project Architecture](#Project-Architecture)
+6. [Grafana and Prometheus](#Grafana-and-Prometheus)
+7. [Set Up Guide](#Set-up-guide)
 
 
 # The motivation behind the project
@@ -24,6 +26,9 @@ The goals of the project were to build a loadbalancer with the Round Robin algor
 5. Skipping Down Backends
 6. Atomic variables and operations
 7. Mutexes
+
+# Tech Stack 
+The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Compose**. 
 
 # Project Architecture
 
