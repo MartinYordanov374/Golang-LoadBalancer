@@ -1,5 +1,7 @@
 # A Static Load Balancer written in Go
 This project implements a static load balancer in **Go** based on the **Round Robin** load balancing algorithm. The project features **active health checks** to the three custom backends every 15 seconds, **health check request timeouts** and **skipping over offline backends.** In addition, the project also features **Prometheus** instrumentation and monitoring in custom **Grafana dashboards**.
+
+
 ## Table of Contents
 
 
@@ -12,6 +14,7 @@ This project implements a static load balancer in **Go** based on the **Round Ro
 7. [Grafana and Prometheus](#Grafana-and-Prometheus)
 8. [Getting Started](#Getting-Started)
 
+**Important: The terms "server" and "backend" are used interchangeably in this project.**
 
 # The motivation behind the project
 I wanted some more novelty and challenge in the down months between getting my bachelor's degree and starting my master's degree. I had the idea of writing my own load balancer for quite a while now, so I finally got to work. I decided to also use this project as a learning ground, and I picked Go as the programming language because it was created exactly for networking and infra-related software. I also wanted to have a portfolio project where I showcase some Prometheus and Grafana skills.
@@ -21,13 +24,13 @@ The goals of the project were to build a load balancer with the Round Robin algo
 
 # Project Features
 1. Active Health Checks and Health Check Cooldowns.
-    - Health Checks for all servers are performed every 15 seconds. Upon a server failing a health check five consecutive times, it is put on cooldown for 15 minutes until further health checks are performed on it. This saves computational power from going to servers that are down and are not likely to come back up within the next health check cycle(s).
+    - Health Checks for all backend are performed every 15 seconds. Upon a backend failing a health check five consecutive times, it is put on cooldown for 15 minutes until further health checks are performed on it. This saves computational power from going to backends that are down and are not likely to come back up within the next health check cycle(s).
 2. Round Robin Routing
-    - Round Robin is utilized to select the next server that the Load Balancer is routing to. The first request that the load balancer receives is sent to the first server on the list of healthy servers, then the next request is routed to the next server in line, etc.
+    - Round Robin is utilized to select the next server that the Load Balancer is routing to. The first request that the load balancer receives is sent to the first backend on the list of healthy backends, then the next request is routed to the next backend in line, etc.
 3. Request Timeouts
-    - If a health check endpoint response takes more than 5 seconds to arrive, the request is cancelled, and the function goes on without it. This ensures that the load balancer does not get stuck waiting for a response from an unresponsive server.
+    - If a health check endpoint response takes more than 5 seconds to arrive, the request is cancelled, and the function goes on without it. This ensures that the load balancer does not get stuck waiting for a response from an unresponsive backend.
 4. Skipping Down Backends
-    - Backends that have failed 5 consecutive health checks are counted as down and not included in the list of healthy servers until their cooldown of 15 minutes expires **and** they successfully pass a health check.
+    - Backends that have failed 5 consecutive health checks are counted as down and not included in the list of healthy backends until their cooldown of 15 minutes expires **and** they successfully pass a health check.
 5. Atomic Variables and Monotonic Clocks
     - Atomic Variables are used as a way of avoiding race conditions since it is possible that more than one goroutine is trying to read and/or write to the same atomic variable at the same time.
     - Monotonic Clocks are used because they measure time regardless of the system time, thus, a change of system time could not affect the cooldown duration.
@@ -40,15 +43,15 @@ The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Com
 # Project Architecture
 The project architecture consists of a reverse proxy that routes client requests to the specified backends and the backends themselves. The reverse proxy also functions as a load balancer because it calls to the functions that implement the load balancer functionality, i.e., FindNextServerIdx, SetServerCooldown, etc. 
 
-The diagram below shows a high-level overview of the architecture. The dashed lines are intended to indicate servers that are down and failing health checks, whereas the solid lines indicate a successful health check and thus routing to the respective server.
+The diagram below shows a high-level overview of the architecture. The dashed lines are intended to indicate backend that are down and failing health checks, whereas the solid lines indicate a successful health check and thus routing to the respective backend.
 
 <img width="1185" height="710" alt="LoadBalancerArchitecture" src="https://github.com/user-attachments/assets/747f38df-e9d4-42ab-8c2b-83f32ca327fc" />
 
-Apart from handling user requests and routing users to a specific server, the load balancer also performs health checks every 15 seconds for every server it is configured to route to. The health checks are at the `/health` endpoint. They either return a status code of `200`, indicating success, or they do not return anything, whereas a status code of `503` is assumed. 
+Apart from handling user requests and routing users to a specific backend, the load balancer also performs health checks every 15 seconds for every backend it is configured to route to. The health checks are at the `/health` endpoint. They either return a status code of `200`, indicating success, or they do not return anything, whereas a status code of `503` is assumed. 
 
 There are two ways that a health check fails:
 1. The health check HTTP request times out.
-2. The server that the health check is performed for is down.
+2. The backend that the health check is performed for is down.
 
 The diagram below shows a high-level overview of how health checks happen:
 
@@ -69,7 +72,7 @@ The project consists of the endpoints, HelperFunctions, Grafana, Prometheus, Ser
 
 **The LoadBalancer Directory** contains the Load Balancer source and the Dockerfile form which the docker image for the docker container is created.  
 
-**The Servers 1, 2, and 3 directories** are all identical with the exception that each server returns a different message to the user, i.e., "Server 1", "Server 2", or "Server 3", depending on which server the user is routed to.
+**The Servers 1, 2, and 3 directories** are all identical with the exception that each server returns a different message to the user, i.e., "Server 1", "Server 2", or "Server 3", depending on which backend the user is routed to.
 
 **The structs folder** contains all of the structs that are referenced in the rest of the code.
 
