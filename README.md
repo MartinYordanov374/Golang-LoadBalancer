@@ -17,7 +17,7 @@ This project implements a static load balancer in **Go** based on the **Round Ro
 I wanted some more novelty and challenge in the down months between getting my bachelor's degree and starting my master's degree. I had the idea of writing my own load balancer for quite a while now, so I finally got to work. I decided to also use this project as a learning ground, and I picked Go as the programming language because it was created exactly for networking and infra-related software. I also wanted to have a portfolio project where I showcase some Prometheus and Grafana skills.
 
 # What I strived to achieve and learn through this project
-The goals of the project were to build a loadbalancer with the Round Robin algorithm and have most of the core load balancer functionalities preset, i.e. active health checks, skipping over down backends, request time outs, etc. I also wanted to pick up on some Go programming skills, which I believe I achieved. In addition, I wanted to dabble around with concurrency, which I found Go and this project to be perfect for. Finally, I wanted to practice my Prometheus and Grafana skills.
+The goals of the project were to build a load balancer with the Round Robin algorithm and have most of the core load balancer functionalities preset, i.e. active health checks, skipping over down backends, request time outs, etc. I also wanted to pick up on some Go programming skills, which I believe I achieved. In addition, I wanted to dabble around with concurrency, which I found Go and this project to be perfect for. Finally, I wanted to practice my Prometheus and Grafana skills.
 
 # Project Features
 1. Active Health Checks and Health Check Cooldowns.
