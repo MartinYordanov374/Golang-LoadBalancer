@@ -38,6 +38,23 @@ The goals of the project were to build a loadbalancer with the Round Robin algor
 The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Compose**. 
 
 # Project Architecture
+The project architecture consists of a reverse proxy that routes client requests to the specified backends and the backends themselves. The reverse proxy also functions as a load balancer because it calls to the functions that implement the load balancer functionality, i.e., FindNextServerIdx, SetServerCooldown, etc. 
+
+The diagram below shows a high-level overview of the architecture. The dashed lines are intended to indicate servers that are down and failing health checks, whereas the solid lines indicate a successful health check and thus routing to the respective server.
+
+<img width="1185" height="710" alt="LoadBalancerArchitecture" src="https://github.com/user-attachments/assets/747f38df-e9d4-42ab-8c2b-83f32ca327fc" />
+
+Apart from handling user requests and routing users to a specific server, the load balancer also performs health checks every 15 seconds for every server it is configured to route to. The health checks are at the `/health` endpoint. They either return a status code of `200`, indicating success, or they do not return anything, whereas a status code of `503` is assumed. 
+
+There are two ways that a health check fails:
+1. The health check HTTP request times out.
+2. The server that the health check is performed for is down.
+
+The diagram below shows a high-level overview of how health checks happen:
+
+<img width="779" height="703" alt="TimeOutDiagram" src="https://github.com/user-attachments/assets/a4205e36-ace5-4c10-8f72-03344947594a" />
+
+It is important to note that I spent a lot of time preventing race conditions and deadlocks when handling concurrent operations and processes. I haven't caught either of those after debugging the source code and implementing various solutions such as mutexes and using atomic variables where applicable. If you run the project and notice such, however, **please let me know**. I am interested to see where and how they occur.
 
 # Project Structure
 The project consists of the endpoints, HelperFunctions, Grafana, Prometheus, Server1, Server2, Server3, and Structs directories. 
