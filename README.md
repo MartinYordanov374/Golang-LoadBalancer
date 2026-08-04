@@ -20,13 +20,19 @@ I wanted some more novelty and challenge in the down months between getting my b
 The goals of the project were to build a loadbalancer with the Round Robin algorithm and have most of the core load balancer functionalities preset, i.e. active health checks, skipping over down backends, request time outs, etc. I also wanted to pick up on some Go programming skills, which I believe I achieved. In addition, I wanted to dabble around with concurrency, which I found Go and this project to be perfect for. Finally, I wanted to practice my Prometheus and Grafana skills.
 
 # Project Features
-1. Active Health Checks  
+1. Active Health Checks and Health Check Cooldowns.
+    - Health Checks for all servers are performed every 15 seconds. Upon a server failing a health check five consecutive times, it is put on cooldown for 15 minutes until further health checks are performed on it. This saves computational power from going to servers that are down and are not likely to come back up within the next health check cycle(s).
 2. Round Robin Routing
+    - Round Robin is utilized to select the next server that the Load Balancer is routing to. The first request that the load balancer receives is sent to the first server on the list of healthy servers, then the next request is routed to the next server in line, etc.
 3. Request Timeouts
-4. Health Checks Cooldown
-5. Skipping Down Backends
-6. Atomic variables and operations
-7. Mutexes
+    - If a health check endpoint response takes more than 5 seconds to arrive, the request is cancelled, and the function goes on without it. This ensures that the load balancer does not get stuck waiting for a response from an unresponsive server.
+4. Skipping Down Backends
+    - Backends that have failed 5 consecutive health checks are counted as down and not included in the list of healthy servers.
+5. Atomic Variables and Monotonic Clocks
+    - Atomic Variables are used as a way of avoiding race conditions since it is possible that more than one goroutine is trying to read and/or write to the same atomic variable at the same time.
+    - Monotonic Clocks are used because they measure time regardless of the system time, thus, a change of system time could not affect the cooldown duration.
+6. Mutexes
+    - Mutexes were used where using atomic variables was either not possible or not the best solution when it came to avoiding race conditions and deadlocks.
 
 # Tech Stack 
 The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Compose**. 
