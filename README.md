@@ -27,7 +27,7 @@ The goals of the project were to build a loadbalancer with the Round Robin algor
 3. Request Timeouts
     - If a health check endpoint response takes more than 5 seconds to arrive, the request is cancelled, and the function goes on without it. This ensures that the load balancer does not get stuck waiting for a response from an unresponsive server.
 4. Skipping Down Backends
-    - Backends that have failed 5 consecutive health checks are counted as down and not included in the list of healthy servers.
+    - Backends that have failed 5 consecutive health checks are counted as down and not included in the list of healthy servers until their cooldown of 15 minutes expires **and** they successfully pass a health check.
 5. Atomic Variables and Monotonic Clocks
     - Atomic Variables are used as a way of avoiding race conditions since it is possible that more than one goroutine is trying to read and/or write to the same atomic variable at the same time.
     - Monotonic Clocks are used because they measure time regardless of the system time, thus, a change of system time could not affect the cooldown duration.
