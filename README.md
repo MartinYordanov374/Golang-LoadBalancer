@@ -66,6 +66,8 @@ The diagram below shows a high-level overview of how health checks happen:
 
 It is important to note that I spent a lot of time preventing race conditions and deadlocks when handling concurrent operations and processes. I haven't caught either of those after debugging the source code and implementing various solutions such as mutexes and using atomic variables where applicable. If you run the project and notice such, however, **please let me know**. I am interested to see where and how they occur.
 
+I also **tested for race conditions**, using the [Data Race Detector](#https://go.dev/doc/articles/race_detector) and **did not catch any race conditions during the entire development process.**
+
 # Project Structure
 The project consists of the endpoints, HelperFunctions, Grafana, Prometheus, Server1, Server2, Server3, and Structs directories. 
 
