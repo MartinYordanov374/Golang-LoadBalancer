@@ -1,6 +1,12 @@
 # A Static Load Balancer written in Go
 This project implements a static load balancer in **Go** based on the **Round Robin** load balancing algorithm. The project features **active health checks** to the three custom backends every 15 seconds, **health check request timeouts** and **skipping over offline backends.** In addition, the project also features **Prometheus** instrumentation and monitoring in custom **Grafana dashboards**.
 
+# A short demo
+
+The GIF below shows the load balancer routing to the three servers that are up. Next, *ServerOne* is turned off. I wait approximately 15 seconds until I am sure that a health check happened after the server went down, and the load balancer skips it over after it fails a health check and routes to servers 2 and 3 only.
+<img width="800" height="416" alt="LoadBalancerGif" src="https://github.com/user-attachments/assets/3108b360-3294-41db-b3a8-31a2a968cdc4" />
+
+**Note:** Refer to the [Future Works Section](#Future-Works) for the project caveats.
 
 ## Table of Contents
 
@@ -13,6 +19,7 @@ This project implements a static load balancer in **Go** based on the **Round Ro
 6. [Project Structure](#Project-Structure)
 7. [Grafana and Prometheus](#Grafana-and-Prometheus)
 8. [Getting Started](#Getting-Started)
+9. [Future Works](#Future-Works)
 
 **Important: The terms "server" and "backend" are used interchangeably in this project.**
 
@@ -190,3 +197,5 @@ The backend HTTP servers are on ports 8080, 8081, and 8082.
 
 Grafana is on port 3000, and Prometheus is on port 9090.
 Note that I have not set up any custom credentials for Grafana, so you should be able to log in with the default credentials.
+
+# Future Works
