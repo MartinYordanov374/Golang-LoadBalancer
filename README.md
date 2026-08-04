@@ -130,7 +130,7 @@ Run the Docker Compose command:
 
 ```docker compose up --build```
 
-You should have the project running on localhost now. 
+You should have the project running on localhost now. Keep in mind that it takes about 30 seconds after having all containers running that the load balancer starts accepting and re-routing requests.
 
 The Load Balancer is exposed on port 8000. 
 
