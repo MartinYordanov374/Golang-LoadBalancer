@@ -204,3 +204,4 @@ Currently, the project is quite simplistic. A couple of improvements that I thou
 1. Implement other routing algorithms, i.e. IP Hash or Weighted Round Robin
 2. Implement Caching
    	- Currently, if a server goes down before a health check has established that it is down and a client visits the reverse proxy at port 8000, an error would be shown to the user, stating that the server could not be found. In such cases, I thought of caching the response of a generic endpoint from the server **or** having the load balancer inject some sort of a message to the user, i.e., *"The server seems to be down, please try refreshing this page."*
+3. Use an actual backend rather than a simplistic HTTP response writer, i.e., a web application with an authentication system and a database. 
