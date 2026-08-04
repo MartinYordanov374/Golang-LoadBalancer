@@ -8,7 +8,7 @@ This project implements a static load balancer in **Go** based on the **Round Ro
 3. [Project Features](#Project-Features)
 4. [Tech Stack](#Tech-Stack)
 5. [Project Architecture](#Project-Architecture)
-6. [Project Structure)[#Project-Structure)
+6. [Project Structure](#Project-Structure)
 7. [Grafana and Prometheus](#Grafana-and-Prometheus)
 8. [Getting Started](#Getting-Started)
 
