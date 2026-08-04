@@ -90,3 +90,27 @@ The full tree structure is shown below:
 # Grafana and Prometheus
 
 # Getting Started
+
+You only need to have Docker and Docker Compose installed. 
+
+Once you have them installed, everything else will be taken care of automatically. The steps to running the project are as follows:
+
+First, navigate to your terminal and clone the project on your machine:
+
+```git clone https://github.com/MartinYordanov374/Golang-LoadBalancer.git```
+
+Once the project is cloned, navigate to the repository:
+
+```cd GoLang-LoadBalancer ```
+
+Run the Docker Compose command:
+
+```docker compose up --build```
+
+You should have the project running on localhost now. 
+
+The Load Balancer is exposed on port 8000. 
+
+The backend HTTP servers are on ports 8080, 8081, and 8082. 
+
+Grafana is on port 3000, and Prometheus is on port 9090.
