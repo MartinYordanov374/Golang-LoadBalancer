@@ -1,6 +1,12 @@
 # A Static Load Balancer written in Go
 This project implements a static load balancer in **Go** based on the **Round Robin** load balancing algorithm. The project features **active health checks** to the three custom backends every 15 seconds, **health check request timeouts** and **skipping over offline backends.** In addition, the project also features **Prometheus** instrumentation and monitoring in custom **Grafana dashboards**.
 
+# Tech Stack 
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-%23E6522C.svg?style=for-the-badge&logo=Prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+
 # A short demo
 
 The GIF below shows the load balancer routing to the three servers that are up. Next, *ServerOne* is turned off. I wait approximately 15 seconds until I am sure that a health check happened after the server went down, and the load balancer skips it over after it fails a health check and routes to servers 2 and 3 only.
@@ -10,11 +16,9 @@ The GIF below shows the load balancer routing to the three servers that are up. 
 
 ## Table of Contents
 
-
 1. [The motivation behind the project](#The-motivation-behind-the-project)
 2. [What I strived to achieve and learn through this project](#What-I-strived-to-achieve-and-learn-through-this-project)
 3. [Project Features](#Project-Features)
-4. [Tech Stack](#Tech-Stack)
 5. [Project Architecture](#Project-Architecture)
 6. [Project Structure](#Project-Structure)
 7. [Grafana and Prometheus](#Grafana-and-Prometheus)
@@ -43,9 +47,6 @@ The goals of the project were to build a load balancer with the Round Robin algo
     - Monotonic Clocks are used because they measure time regardless of the system time, thus, a change of system time could not affect the cooldown duration.
 6. **Mutexes**
     - Mutexes were used where using atomic variables was either not possible or not the best solution when it came to avoiding race conditions and deadlocks.
-
-# Tech Stack 
-The tech stack consists of **Go**, **Prometheus**, **Grafana**, and **Docker Compose**. 
 
 # Project Architecture
 The project architecture consists of a reverse proxy that routes client requests to the specified backends and the backends themselves. The reverse proxy also functions as a load balancer because it calls to the functions that implement the load balancer functionality, i.e., FindNextServerIdx, SetServerCooldown, etc. 
