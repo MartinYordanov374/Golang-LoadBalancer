@@ -1,24 +1,9 @@
 package Structs
 
 import (
-	"sync"
 	"github.com/prometheus/client_golang/prometheus"
-	"sync/atomic"
-	"time"
 )
 
-type Server struct {
-	Host string
-	Port int
-	IsUp atomic.Bool
-	Mutex sync.RWMutex
-	DownCount atomic.Uint32
-	WentDownTimeStamp time.Time
-	IsInCooldown atomic.Bool
-	CooldownEndTimeStamp time.Time
-	CooldownStartTimeStamp time.Time
-	PrometheusLabel string
-}
 type HealthCheckEndpointResponse struct {
 	StatusCode int `json:"StatusCode"`
 	Message string	`json:"Message"`
